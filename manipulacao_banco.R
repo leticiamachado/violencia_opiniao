@@ -53,11 +53,34 @@ LapopBrazil_2010$Ano <- 2010
 LapopBrazil_2012$Ano <- 2012
 LapopBrazil_2014$Ano <- 2014
   
-#-----------------------------#
-# Mergir bancos
+# Mergir bancos, selecionando variaveis especificas
+data_saliencia <- rbind(LapopBrazil_2006[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
+                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
+                                            "Renda_Familiar",  "Raça", "Ano")],
+                        LapopBrazil_2008[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
+                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
+                                            "Renda_Familiar",  "Raça", "Ano")], 
+                        LapopBrazil_2010[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
+                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
+                                            "Renda_Familiar",  "Raça", "Ano")],
+                        LapopBrazil_2012[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
+                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
+                                            "Renda_Familiar",  "Raça", "Ano")],
+                        LapopBrazil_2014[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
+                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
+                                            "Renda_Familiar",  "Raça", "Ano")])
 
-data_saliencia <- rbind(LapopBrazil_2006[,c(1:3, 7:8, 10, 11, 13:15)], LapopBrazil_2008[], LapopBrazil_2010,
-                        LapopBrazil_2012, LapopBrazil_2014)
+
+# Recodificar NAs em Avaliação do Governo
+data_saliencia$Avaliação_Governo <- str_replace(data_saliencia$Avaliação_Governo, "8", "")
+data_saliencia$Avaliação_Governo <- str_replace(data_saliencia$Avaliação_Governo, "9", "")
+data_saliencia$Avaliação_Governo <- as.numeric(data_saliencia$Avaliação_Governo)
+
+#
+data_saliencia$Voto
+
+
+
 
 
 
