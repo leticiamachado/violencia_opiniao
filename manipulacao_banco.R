@@ -16,7 +16,7 @@
 # install.packages(c("readxl"))
 
 # carregar pacote
-library(readxl)
+library(readxl); library(stringr); library(dplyr); library(stargazer)
 
 # ler bancos de dados
 LapopBrazil_2006 <- read_excel("Dados/LapopBrazil_2006.xlsx")
@@ -52,32 +52,72 @@ LapopBrazil_2008$Ano <- 2008
 LapopBrazil_2010$Ano <- 2010
 LapopBrazil_2012$Ano <- 2012
 LapopBrazil_2014$Ano <- 2014
+
+# Criar variavel de voto
+LapopBrazil_2006 <- mutate(LapopBrazil_2006, Voto_Incumbente = ifelse(Voto == 1 , 1, 0))
+LapopBrazil_2008 <- mutate(LapopBrazil_2008, Voto_Incumbente = ifelse(Voto == 1501 , 1, 0))
+LapopBrazil_2010 <- mutate(LapopBrazil_2010, Voto_Incumbente = ifelse(Voto == 1501 , 1, 0))
+LapopBrazil_2012 <- mutate(LapopBrazil_2010, Voto_Incumbente = ifelse(Voto == 1501 , 1, 0))
+LapopBrazil_2014 <- mutate(LapopBrazil_2010, Voto_Incumbente = ifelse(Voto == 1501 , 1, 0))
+
   
-# Mergir bancos, selecionando variaveis especificas
-data_saliencia <- rbind(LapopBrazil_2006[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
-                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
-                                            "Renda_Familiar",  "Raça", "Ano")],
-                        LapopBrazil_2008[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
-                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
-                                            "Renda_Familiar",  "Raça", "Ano")], 
-                        LapopBrazil_2010[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
-                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
-                                            "Renda_Familiar",  "Raça", "Ano")],
-                        LapopBrazil_2012[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
-                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
-                                            "Renda_Familiar",  "Raça", "Ano")],
-                        LapopBrazil_2014[,c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
-                                            "Avaliação_Governo", "Voto", "Idade","Escolaridade",
-                                            "Renda_Familiar",  "Raça", "Ano")])
+## Mergir bancos, selecionando  as variaveis de interesse ##
+
+# definir variaveis
+vars <- c("Urbanização",  "Gênero" ,  "Saliência_Violência", 
+          "Avaliação_Governo", "Voto", "Idade","Escolaridade",
+          "Renda_Familiar",  "Raça", "Ano", "Voto_Incumbente")
+
+# mergir bancos
+data_saliencia <- rbind(LapopBrazil_2006[,vars],
+                        LapopBrazil_2008[,vars], 
+                        LapopBrazil_2010[,vars],
+                        LapopBrazil_2012[,vars],
+                        LapopBrazil_2014[,vars])
 
 
-# Recodificar NAs em Avaliação do Governo
+# Recodificar NAs em Avaliacao do Governo
 data_saliencia$Avaliação_Governo <- str_replace(data_saliencia$Avaliação_Governo, "8", "")
 data_saliencia$Avaliação_Governo <- str_replace(data_saliencia$Avaliação_Governo, "9", "")
 data_saliencia$Avaliação_Governo <- as.numeric(data_saliencia$Avaliação_Governo)
 
-#
-data_saliencia$Voto
+# Recodificar Urbanizazao
+data_saliencia$Urbanização <- str_replace(data_saliencia$Urbanização, "2", "0")
+data_saliencia$Urbanização <- factor(data_saliencia$Urbanização, levels = c("1", "0"), labels = c("Urbano", "Rural"))
+
+
+#================================#
+# MODELOS DE REGRESSAO LOGISTICA #
+#================================#
+
+#---------------------------------#
+# Funcao para executar modelos
+#---------------------------------#
+
+model.reglog <- function(x, VD){
+  glm(  VD ~  
+        Urbanização +
+        Gênero +
+        Saliência_Violência +
+        Idade +
+        Escolaridade +
+        Renda_Familiar +
+        Raça, 
+      data = x, family = "binomial")
+}
+
+
+#----- MODELO1 -----#
+model1 <- model.reglog(data_saliencia, data_saliencia$Voto)
+
+
+
+
+
+
+
+
+
 
 
 
